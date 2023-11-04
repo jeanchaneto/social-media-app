@@ -46,3 +46,8 @@ export type NewUser = {
   username: string;
   password: string;
 };
+
+export type FirebaseError = {
+  code: string;
+  message: string;
+};

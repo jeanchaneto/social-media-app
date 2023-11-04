@@ -2,7 +2,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
+import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { createUserAccount } from "@/lib/firebase";
 
 const SignUpForm = () => {
+  const { toast } = useToast();
   const isLoading = false;
 
   // 1. Define your form.
@@ -35,7 +36,16 @@ const SignUpForm = () => {
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
     // Create new user
     const newUser = await createUserAccount(values);
-    console.log(newUser);
+    if (!newUser) {
+      return toast({
+        title: "Sign Up failed, Please try again",
+      });
+    }
+    if(newUser) {
+      return toast({
+        title: "Sign Up Successful",
+      });
+    }
   }
 
   return (
@@ -133,7 +143,13 @@ const SignUpForm = () => {
             )}
           </Button>
           <p className="text-small-regular text-light-2 text-center mt-2">
-            Already have an account?<Link to="/sign-in" className="text-primary-500 text-small-semibold ml-1" >Sign in</Link>
+            Already have an account?
+            <Link
+              to="/sign-in"
+              className="text-primary-500 text-small-semibold ml-1"
+            >
+              Sign in
+            </Link>
           </p>
         </form>
       </div>

@@ -1,4 +1,4 @@
-import { NewUser } from "@/types";
+import { FirebaseError, NewUser } from "@/types";
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import {
@@ -66,10 +66,13 @@ export const createUserAccount = async (newUser: NewUser) => {
       name: newUser.name,
       email: newUser.email,
     });
-
-    console.log("User created with additional information", user);
+    return user;
   } catch (error) {
-    console.log(error);
+    const firebaseError = error as FirebaseError;
+    const errorCode = firebaseError.code;
+    const errorMessage = firebaseError.message;
+    console.log(errorCode);
+    console.log(errorMessage);
   }
 };
 
