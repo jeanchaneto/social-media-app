@@ -5,7 +5,6 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signOut,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
@@ -29,8 +28,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 //Authentication
-const auth = getAuth(app);
+export const auth = getAuth(app);
 
+//Sign In
 export const loginEmailPassword = async (
   loginEmail: string,
   loginPassword: string
@@ -41,9 +41,14 @@ export const loginEmailPassword = async (
       loginEmail,
       loginPassword
     );
-    console.log(userCredential);
+    const user = userCredential.user;
+    console.log(user)
   } catch (error) {
-    console.log(error);
+    const firebaseError = error as FirebaseError;
+    const errorCode = firebaseError.code;
+    const errorMessage = firebaseError.message;
+    console.log(errorCode);
+    console.log(errorMessage);
   }
 };
 
@@ -76,18 +81,18 @@ export const createUserAccount = async (newUser: NewUser) => {
   }
 };
 
-//Authentication State
-export const monitorAuthState = async () => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log(user);
-      //Logged in logic
-    } else {
-      console.log("Not logged in");
-      //Not logged logic
-    }
-  });
-};
+// //Authentication State
+// export const monitorAuthState = async () => {
+//   onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//       console.log(user);
+//       //Logged in logic
+//     } else {
+//       console.log("Not logged in");
+//       //Not logged logic
+//     }
+//   });
+// };
 
 //Log out
 export const logOut = async () => {

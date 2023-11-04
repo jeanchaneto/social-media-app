@@ -16,10 +16,11 @@ import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
 import { Link } from "react-router-dom";
 import { createUserAccount } from "@/lib/firebase";
+import { useState } from "react";
 
 const SignUpForm = () => {
   const { toast } = useToast();
-  const isLoading = false;
+  const [isCreating, setIsCreating] = useState(false);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -35,13 +36,16 @@ const SignUpForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
     // Create new user
+    setIsCreating(true);
     const newUser = await createUserAccount(values);
     if (!newUser) {
+      setIsCreating(false);
       return toast({
         title: "Sign Up failed, Please try again",
       });
     }
-    if(newUser) {
+    if (newUser) {
+      setIsCreating(false);
       return toast({
         title: "Sign Up Successful",
       });
@@ -133,7 +137,7 @@ const SignUpForm = () => {
             )}
           />
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreating ? (
               <div className="flex-center gap-2">
                 <Loader />
                 Loading...

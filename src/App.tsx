@@ -6,8 +6,12 @@ import SignUpForm from "./_auth/forms/SignUpForm";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
 import { Toaster } from "./components/ui/toaster";
+import { useContext } from "react";
+import { AuthContext } from "./context/auth-context";
 
 function App() {
+  const {currentUser} =useContext(AuthContext);
+  console.log(currentUser)
   return (
     <BrowserRouter>
       <main className="flex h-screen">
