@@ -10,8 +10,8 @@ import { useContext } from "react";
 import { AuthContext } from "./context/auth-context";
 
 function App() {
-  const {currentUser} =useContext(AuthContext);
-  console.log(currentUser)
+  const {currentUser, userData } =useContext(AuthContext);
+  console.log(userData, currentUser)
   return (
     <BrowserRouter>
       <main className="flex h-screen">

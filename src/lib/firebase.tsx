@@ -1,5 +1,6 @@
 import { FirebaseError, NewUser } from "@/types";
 import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
@@ -7,7 +8,6 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 //Config
 const firebaseConfig = {
@@ -42,7 +42,7 @@ export const loginEmailPassword = async (
       loginPassword
     );
     const user = userCredential.user;
-    console.log(user)
+    console.log(user);
   } catch (error) {
     const firebaseError = error as FirebaseError;
     const errorCode = firebaseError.code;
@@ -81,20 +81,26 @@ export const createUserAccount = async (newUser: NewUser) => {
   }
 };
 
-// //Authentication State
-// export const monitorAuthState = async () => {
-//   onAuthStateChanged(auth, (user) => {
-//     if (user) {
-//       console.log(user);
-//       //Logged in logic
-//     } else {
-//       console.log("Not logged in");
-//       //Not logged logic
-//     }
-//   });
-// };
-
 //Log out
 export const logOut = async () => {
   await signOut(auth);
+};
+
+//Get user data
+export const getUserData = async (userId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      return {
+        id: userDocSnap.id,
+        ...userDocSnap.data(),
+      };
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };

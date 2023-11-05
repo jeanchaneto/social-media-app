@@ -1,14 +1,19 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth, getUserData } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { User as FirebaseUser } from "firebase/auth";
+import { User } from '@/types';
+
+type AdditionalUserData = User
 
 // Define the shape of the context data
 type AuthContextType = {
-  currentUser: User | null;
+  currentUser: FirebaseUser | null;
+  userData: AdditionalUserData | null;
 }
 
 // Create the context with a default value
-export const AuthContext = createContext<AuthContextType>({ currentUser: null });
+export const AuthContext = createContext<AuthContextType>({ currentUser: null, userData: null });
 
 // Define the types for the AuthProvider's props
 type AuthProviderProps = {
@@ -17,11 +22,19 @@ type AuthProviderProps = {
 
 // Create the AuthProvider component with proper typing
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [userData, setUserData] = useState<AdditionalUserData | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async(user) => {
       setCurrentUser(user);
+      if (user) {
+         const additionalData = await getUserData(user.uid);
+         if (additionalData) {setUserData(additionalData as User)
+        }  
+      } else {
+        setUserData(null);
+      }
     });
 
     // Cleanup subscription on unmount
@@ -29,7 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser }}>
+    <AuthContext.Provider value={{ currentUser, userData }}>
       {children}
     </AuthContext.Provider>
   );
