@@ -51,3 +51,8 @@ export type FirebaseError = {
   code: string;
   message: string;
 };
+
+export type UserLogin = {
+  email: string;
+  password: string;
+}

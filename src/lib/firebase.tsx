@@ -1,4 +1,4 @@
-import { FirebaseError, NewUser } from "@/types";
+import { FirebaseError, NewUser, UserLogin } from "@/types";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
@@ -32,17 +32,16 @@ export const auth = getAuth(app);
 
 //Sign In
 export const loginEmailPassword = async (
-  loginEmail: string,
-  loginPassword: string
+userLogin: UserLogin
 ) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
-      loginEmail,
-      loginPassword
+      userLogin.email,
+      userLogin.password
     );
     const user = userCredential.user;
-    console.log(user);
+    return user;
   } catch (error) {
     const firebaseError = error as FirebaseError;
     const errorCode = firebaseError.code;

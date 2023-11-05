@@ -10,7 +10,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/auth-context";
 
 function App() {
-  const {currentUser, userData } =useContext(AuthContext);
+  const {currentUser, userData } = useContext(AuthContext);
   console.log(userData, currentUser)
   return (
     <BrowserRouter>

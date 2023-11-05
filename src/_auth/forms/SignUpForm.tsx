@@ -14,13 +14,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createUserAccount } from "@/lib/firebase";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "@/context/auth-context";
 
 const SignUpForm = () => {
   const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
+  const naviguate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (currentUser) {
+      // If the user is already logged in, redirect to the home page
+      naviguate("/");
+    }
+  }, [currentUser, naviguate]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -46,6 +56,8 @@ const SignUpForm = () => {
     }
     if (newUser) {
       setIsCreating(false);
+      form.reset();
+      naviguate("/");
       return toast({
         title: "Sign Up Successful",
       });
@@ -62,7 +74,6 @@ const SignUpForm = () => {
         <p className="text-light-3 small-medium md:base-regular mt-2">
           Enter your details
         </p>
-
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5 w-full"
@@ -74,11 +85,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="shadcn"
-                    className="shad-input"
-                    {...field}
-                  />
+                  <Input className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -91,11 +98,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="shadcn"
-                    className="shad-input"
-                    {...field}
-                  />
+                  <Input className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -108,11 +111,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="shadcn"
-                    className="shad-input"
-                    {...field}
-                  />
+                  <Input className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -125,12 +124,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="shadcn"
-                    className="shad-input"
-                    {...field}
-                  />
+                  <Input type="password" className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +134,7 @@ const SignUpForm = () => {
             {isCreating ? (
               <div className="flex-center gap-2">
                 <Loader />
-                Loading...
+                Creating new account...
               </div>
             ) : (
               "Sign up"
