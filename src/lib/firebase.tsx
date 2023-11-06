@@ -111,6 +111,12 @@ export const getUserData = async (userId: string) => {
   }
 };
 
+//Convert tags to array of lowercase strings
+const convertToTagArray = (tags:string) => {
+  const tagsArray = tags.split(',').map((tag:string) => { return tag.trim().toLowerCase()});
+  return tagsArray;
+} 
+
 //Create post
 export const createPost = async (values: PostFormValues, userId: string) => {
   if (values.file && values.file.length > 0) {
@@ -126,10 +132,9 @@ export const createPost = async (values: PostFormValues, userId: string) => {
       caption: values.caption,
       imageUrl: fileUrl,
       location: values.location,
-      tags: values.tags,
+      tags: convertToTagArray(values.tags),
       createdAt: serverTimestamp(),
       userId
-      // Add other post details
     };
     await addDoc(collection(db, "posts"), postDoc);
   }
