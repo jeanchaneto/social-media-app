@@ -1,3 +1,4 @@
+
 export type NavLink = {
   imgURL: string;
   route: string;
@@ -56,3 +57,10 @@ export type UserLogin = {
   email: string;
   password: string;
 }
+
+export type PostFormValues = {
+  caption: string;
+  file: File[];
+  location: string;
+  tags: string;
+};

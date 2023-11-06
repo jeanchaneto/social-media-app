@@ -14,8 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
+import { useContext } from "react";
+import { AuthContext } from "@/context/auth-context";
+import { createPost } from "@/lib/firebase";
 
 const PostForm = ({ post }) => {
+  const { currentUser } = useContext(AuthContext);
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -27,10 +31,19 @@ const PostForm = ({ post }) => {
   });
 
   function onSubmit(values: z.infer<typeof PostValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const userId = currentUser?.uid;
+    if (userId) {
+      createPost(values, userId)
+        .then(() => {
+          console.log("Post created successfully");
+          // Handle successful post creation
+        })
+        .catch((error) => {
+          console.log("Error creating post:", error);
+        });
+    }
   }
+  
   return (
     <Form {...form}>
       <form

@@ -1,6 +1,6 @@
-import { FirebaseError, NewUser, UserLogin } from "@/types";
+import { FirebaseError, NewUser, PostFormValues, UserLogin } from "@/types";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 //Config
 const firebaseConfig = {
@@ -26,6 +27,11 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firestore
 const db = getFirestore(app);
+
+//Initialize storage
+const storage = getStorage();
+//create reference to root of storage bucket
+const storageRef = ref(storage);
 
 //Authentication
 export const auth = getAuth(app);
@@ -101,5 +107,27 @@ export const getUserData = async (userId: string) => {
     }
   } catch (error) {
     console.log(error);
+  }
+};
+
+//Create post
+export const createPost = async (values: PostFormValues, userId: string) => {
+  if (values.file && values.file.length > 0) {
+    // Upload file to Firebase Storage
+    const fileRef = ref(storage, `uploads/${values.file[0].name}`);
+    const uploadResult = await uploadBytes(fileRef, values.file[0]);
+    const fileUrl = await getDownloadURL(uploadResult.ref);
+
+    // Create Firestore document
+    const postDoc = {
+      caption: values.caption,
+      imageUrl: fileUrl,
+      location: values.location,
+      tags: values.tags,
+      createdAt: serverTimestamp(),
+      userId
+      // Add other post details
+    };
+    await addDoc(collection(db, "posts"), postDoc);
   }
 };
