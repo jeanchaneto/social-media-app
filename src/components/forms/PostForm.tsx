@@ -14,12 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { createPost } from "@/lib/firebase";
 
 const PostForm = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
+  const [isCreating, setIsCreating] = useState(false);
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -30,20 +31,21 @@ const PostForm = ({ post }) => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof PostValidation>) {
+  async function onSubmit(values: z.infer<typeof PostValidation>) {
     const userId = currentUser?.uid;
     if (userId) {
-      createPost(values, userId)
-        .then(() => {
-          console.log("Post created successfully");
-          // Handle successful post creation
-        })
-        .catch((error) => {
-          console.log("Error creating post:", error);
-        });
+      setIsCreating(true);
+      try {
+        await createPost(values, userId);
+        setIsCreating(false);
+        form.reset();
+        console.log("Post created successfully!");
+      } catch (error) {
+        console.log("Error creating post:", error);
+      }
     }
   }
-  
+
   return (
     <Form {...form}>
       <form
@@ -117,8 +119,8 @@ const PostForm = ({ post }) => {
           <Button type="button" className="shad-button_dark_4">
             Cancel
           </Button>
-          <Button type="submit" className="shad-button_primary">
-            Submit
+          <Button disabled={isCreating} type="submit" className="shad-button_primary">
+            { isCreating ? "Creating Post..." :"Submit"}
           </Button>
         </div>
       </form>
