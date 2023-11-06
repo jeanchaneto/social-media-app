@@ -17,10 +17,14 @@ import { PostValidation } from "@/lib/validation";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { createPost } from "@/lib/firebase";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../ui/use-toast";
 
 const PostForm = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
   const [isCreating, setIsCreating] = useState(false);
+  const naviguate = useNavigate();
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -39,9 +43,15 @@ const PostForm = ({ post }) => {
         await createPost(values, userId);
         setIsCreating(false);
         form.reset();
-        console.log("Post created successfully!");
+        naviguate("/");
+        return toast({
+          title: "Post created successfully",
+        });
       } catch (error) {
         console.log("Error creating post:", error);
+        return toast({
+          title: "Error creating post",
+        });
       }
     }
   }

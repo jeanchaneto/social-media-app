@@ -9,6 +9,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 
 //Config
 const firebaseConfig = {
@@ -113,8 +114,10 @@ export const getUserData = async (userId: string) => {
 //Create post
 export const createPost = async (values: PostFormValues, userId: string) => {
   if (values.file && values.file.length > 0) {
+    //Create unique ID for storage path
+    const uniqueFileName = `${uuidv4()}-${values.file[0].name}`;
     // Upload file to Firebase Storage
-    const fileRef = ref(storage, `uploads/${values.file[0].name}`);
+    const fileRef = ref(storage, `uploads/${uniqueFileName}`);
     const uploadResult = await uploadBytes(fileRef, values.file[0]);
     const fileUrl = await getDownloadURL(uploadResult.ref);
 
