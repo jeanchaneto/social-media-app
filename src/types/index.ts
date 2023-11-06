@@ -1,3 +1,5 @@
+import { type Timestamp } from 'firebase/firestore';
+
 
 export type NavLink = {
   imgURL: string;
@@ -13,6 +15,16 @@ export type UpdateUser = {
   imageUrl: URL | string;
   file: File[];
 };
+
+export type IPost = {
+  id: string;
+  caption: string;
+  imageUrl: string;
+  location: string;
+  tags: string[];
+  userId: string;
+  createdAt: Timestamp;
+}
 
 export type NewPost = {
   userId: string;

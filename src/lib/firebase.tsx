@@ -1,6 +1,24 @@
-import { FirebaseError, NewUser, PostFormValues, UserLogin } from "@/types";
+import {
+  FirebaseError,
+  IPost,
+  NewUser,
+  PostFormValues,
+  UserLogin,
+} from "@/types";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp, addDoc, collection } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  addDoc,
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
@@ -9,7 +27,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 //Config
 const firebaseConfig = {
@@ -38,9 +56,7 @@ const storageRef = ref(storage);
 export const auth = getAuth(app);
 
 //Sign In
-export const loginEmailPassword = async (
-userLogin: UserLogin
-) => {
+export const loginEmailPassword = async (userLogin: UserLogin) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -112,10 +128,12 @@ export const getUserData = async (userId: string) => {
 };
 
 //Convert tags to array of lowercase strings
-const convertToTagArray = (tags:string) => {
-  const tagsArray = tags.split(',').map((tag:string) => { return tag.trim().toLowerCase()});
+const convertToTagArray = (tags: string) => {
+  const tagsArray = tags.split(",").map((tag: string) => {
+    return tag.trim().toLowerCase();
+  });
   return tagsArray;
-} 
+};
 
 //Create post
 export const createPost = async (values: PostFormValues, userId: string) => {
@@ -134,8 +152,42 @@ export const createPost = async (values: PostFormValues, userId: string) => {
       location: values.location,
       tags: convertToTagArray(values.tags),
       createdAt: serverTimestamp(),
-      userId
+      userId,
     };
     await addDoc(collection(db, "posts"), postDoc);
+  }
+};
+
+//Get latest posts
+export const getLatestPosts = async () => {
+  try {
+    // Create a query against the "posts" collection
+    const postsQuery = query(
+      collection(db, "posts"),
+      orderBy("createdAt", "desc"), // Order by createdAt timestamp in descending order
+      limit(20) // Limit to 20 posts
+    );
+
+    // Execute the query
+    const querySnapshot = await getDocs(postsQuery);
+
+    // Map over the documents and return the data
+    const posts: IPost[] = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        caption: data.caption,
+        imageUrl: data.imageUrl,
+        location: data.location,
+        tags: data.tags,
+        userId: data.userId,
+        createdAt: data.createdAt,
+      };
+    });
+
+    return posts;
+  } catch (error) {
+    console.error("Error getting latest posts: ", error);
+    throw error;
   }
 };

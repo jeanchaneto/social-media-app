@@ -1,10 +1,39 @@
+import Loader from "@/components/shared/Loader";
+import { getLatestPosts } from "@/lib/firebase";
+import { IPost } from "@/types";
+import { useEffect, useState } from "react";
 
 const Home = () => {
-  return (
-    <>
-    <div>Home</div>
-    </>
-  )
-}
+  const [isLoading, setIsloading] = useState(true);
+  const [posts, setPosts] = useState<IPost[] | null>(null);
 
-export default Home
+  useEffect(() => {
+    const fetchPosts = async ()  => {
+      setIsloading(true);
+      try {
+        const fetchedPosts = await getLatestPosts();
+        setPosts(fetchedPosts);
+        console.log(fetchedPosts);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsloading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  return (
+    <div className="flex flex-1">
+      <div className="home-container">
+        <div className="home-posts">
+          <h2 className="h3-bold md:h2-bold text-left w-full">Home Feed</h2>
+          {isLoading && !posts ? <Loader /> : <div>place</div>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
