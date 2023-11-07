@@ -18,6 +18,9 @@ import {
   orderBy,
   limit,
   getDocs,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
 } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 import {
@@ -152,6 +155,7 @@ export const createPost = async (values: PostFormValues, userId: string) => {
       location: values.location,
       tags: convertToTagArray(values.tags),
       createdAt: serverTimestamp(),
+      likes:[],
       userId,
     };
     await addDoc(collection(db, "posts"), postDoc);
@@ -182,6 +186,7 @@ export const getLatestPosts = async () => {
         tags: data.tags,
         userId: data.userId,
         createdAt: data.createdAt,
+        likes: data.likes
       };
     });
 
@@ -189,5 +194,25 @@ export const getLatestPosts = async () => {
   } catch (error) {
     console.error("Error getting latest posts: ", error);
     throw error;
+  }
+};
+
+//Like post
+export const likePost = async (postId: string, userId: string, alreadyLiked: boolean) => {
+  const postRef = doc(db, "posts", postId);
+
+  try {
+  if (alreadyLiked) {
+    // User already liked the post, so remove their like
+    await updateDoc(postRef, {
+      likes: arrayRemove(userId),
+    });
+  } else {
+    // User hasn't liked the post, so add their like
+    await updateDoc(postRef, {
+      likes: arrayUnion(userId),
+    });
+  }} catch(error) {
+    console.log("Error updating like status: ", error)
   }
 };

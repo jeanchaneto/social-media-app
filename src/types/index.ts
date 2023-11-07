@@ -24,6 +24,7 @@ export type IPost = {
   tags: string[];
   userId: string;
   createdAt: Timestamp;
+  likes: string[]
 }
 
 export type NewPost = {
