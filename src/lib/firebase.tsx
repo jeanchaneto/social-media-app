@@ -21,6 +21,8 @@ import {
   updateDoc,
   arrayRemove,
   arrayUnion,
+  deleteDoc,
+  where,
 } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 import {
@@ -52,8 +54,6 @@ const db = getFirestore(app);
 
 //Initialize storage
 const storage = getStorage();
-//create reference to root of storage bucket
-const storageRef = ref(storage);
 
 //Authentication
 export const auth = getAuth(app);
@@ -215,4 +215,20 @@ export const likePost = async (postId: string, userId: string, alreadyLiked: boo
   }} catch(error) {
     console.log("Error updating like status: ", error)
   }
+};
+
+// Function to save a post
+export const savePost = async (postId: string, userId: string) => {
+  const docRef = await addDoc(collection(db, "saves"), { postId, userId });
+  return docRef; // Return the document reference
+};
+
+// Function to unsave a post
+export const unsavePost = async (postId: string, userId: string) => {
+  const savesQuery = query(collection(db, "saves"), where("postId", "==", postId), where("userId", "==", userId));
+  const querySnapshot = await getDocs(savesQuery);
+  querySnapshot.forEach((doc) => {
+    deleteDoc(doc.ref);
+  });
+  return querySnapshot.docs.map(doc => doc.ref); // Return the document references of unsaved posts
 };

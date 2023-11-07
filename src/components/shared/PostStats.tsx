@@ -1,4 +1,4 @@
-import { likePost } from "@/lib/firebase";
+import { likePost, savePost, unsavePost } from "@/lib/firebase";
 import { IPost } from "@/types";
 import { useState } from "react";
 
@@ -14,6 +14,23 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   const [isLiked, setIsLiked] = useState(
     post.likes ? post.likes.includes(userId) : false
   );
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSavePost = async () => {
+    const wasOriginallySaved = isSaved;
+    setIsSaved(!isSaved); // Optimistically update the UI
+
+    try {
+      if (wasOriginallySaved) {
+        await unsavePost(post.id, userId);
+      } else {
+        await savePost(post.id, userId);
+      }
+    } catch (error) {
+      setIsSaved(wasOriginallySaved); // Revert UI on error
+      console.error("Error in saving/unsaving the post:", error);
+    }
+  };
 
   const handleLike = async () => {
     const newLikedStatus = !isLiked;
@@ -42,19 +59,16 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           height={20}
           className="cursor-pointer"
         />
-        <p className="small-medium lg:base-medium">
-          {likeCount}
-        </p>
+        <p className="small-medium lg:base-medium">{likeCount}</p>
       </div>
-      <div className="flex gap-2 mr-5">
+      <div onClick={handleSavePost} className="flex gap-2 mr-5">
         <img
-          src="/assets/icons/save.svg"
+          src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
           alt="save"
           width={20}
           height={20}
           className="cursor-pointer"
         />
-        <p className="small-medium lg:base-medium">0</p>
       </div>
     </div>
   );
