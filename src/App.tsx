@@ -8,7 +8,6 @@ import RootLayout from "./_root/RootLayout";
 import { Toaster } from "./components/ui/toaster";
 // import { useContext } from "react";
 // import { AuthContext } from "./context/auth-context";
-import Explore from "./_root/pages/Explore";
 import Saved from "./_root/pages/Saved";
 import AllUsers from "./_root/pages/AllUsers";
 import CreatePost from "./_root/pages/CreatePost";
@@ -31,7 +30,6 @@ function App() {
           {/* Private Routes */}
           <Route element={<RootLayout />}>
             <Route index element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
             <Route path="/saved" element={<Saved />} />
             <Route path="/all-users" element={<AllUsers />} />
             <Route path="/create-post" element={<CreatePost />} />

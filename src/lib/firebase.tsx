@@ -309,7 +309,16 @@ export const likePost = async (
 
 // Function to save a post
 export const savePost = async (postId: string, userId: string) => {
-  const docRef = await addDoc(collection(db, "saves"), { postId, userId });
+  // Create references to the post and user documents
+  const postRef = doc(db, "posts", postId);
+  const userRef = doc(db, "users", userId);
+
+  // Add a new document in the "saves" collection with these references
+  const docRef = await addDoc(collection(db, "saves"), {
+    postRef: postRef,
+    userRef: userRef
+  });
+
   return docRef; // Return the document reference
 };
 
@@ -325,4 +334,30 @@ export const unsavePost = async (postId: string, userId: string) => {
     deleteDoc(doc.ref);
   });
   return querySnapshot.docs.map((doc) => doc.ref); // Return the document references of unsaved posts
+};
+
+// Get saved posts
+export const getSavedPosts = async (userId: string) => {
+  try {
+    // Reference to the user document
+    const userRef = doc(db, "users", userId);
+
+    // Query the "saves" collection for documents where 'userRef' matches the user reference
+    const savedQuery = query(collection(db, "saves"), where("userRef", "==", userRef));
+    const querySnapshot = await getDocs(savedQuery);
+
+    // Fetch each corresponding post using the postRef
+    const posts = await Promise.all(querySnapshot.docs.map(async (doc) => {
+      const savedData = doc.data();
+      const postSnap = await getDoc(savedData.postRef);
+
+      return postSnap.exists() ? { id: postSnap.id, ...postSnap.data()! } : null;
+    }));
+
+    // Filter out any null values (in case a post was not found)
+    return posts.filter(post => post !== null) as IPost[];
+  } catch (error) {
+    console.error("Error fetching saved posts: ", error);
+    throw error;
+  }
 };
