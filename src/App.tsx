@@ -6,18 +6,15 @@ import SignUpForm from "./_auth/forms/SignUpForm";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
 import { Toaster } from "./components/ui/toaster";
-import { useContext } from "react";
-import { AuthContext } from "./context/auth-context";
 import Saved from "./_root/pages/Saved";
 import AllUsers from "./_root/pages/AllUsers";
 import CreatePost from "./_root/pages/CreatePost";
 import EditPost from "./_root/pages/EditPost";
 import Profile from "./_root/pages/Profile";
 import UpdateProfile from "./_root/pages/UpdateProfile";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
-  const {currentUser, userData } = useContext(AuthContext);
-  console.log(userData, currentUser)
   return (
     <BrowserRouter>
       <main className="flex h-screen">
@@ -29,16 +26,16 @@ function App() {
           </Route>
           {/* Private Routes */}
           <Route element={<RootLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/saved" element={<Saved />} />
-            <Route path="/all-users" element={<AllUsers />} />
-            <Route path="/create-post" element={<CreatePost />} />
-            <Route path="/update-post/:id" element={<EditPost />} />
-            <Route path="/profile/:id/*" element={<Profile />} />
-            <Route path="/update-profile/:id" element={<UpdateProfile />} />
+            <Route index element={ <PrivateRoute><Home /></PrivateRoute>} />
+            <Route path="/saved" element={<PrivateRoute><Saved /></PrivateRoute>} />
+            <Route path="/all-users" element={<PrivateRoute><AllUsers /></PrivateRoute>} />
+            <Route path="/create-post" element={<PrivateRoute><CreatePost /></PrivateRoute>} />
+            <Route path="/update-post/:id" element={<PrivateRoute><EditPost /></PrivateRoute>} />
+            <Route path="/profile/:id/*" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/update-profile/:id" element={<PrivateRoute><UpdateProfile /></PrivateRoute>} />
           </Route>
         </Routes>
-        <Toaster/>
+        <Toaster />
       </main>
     </BrowserRouter>
   );
