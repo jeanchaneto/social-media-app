@@ -36,12 +36,9 @@ const PostCard = ({ post }: PostCardProps) => {
     <div className={`post-card ${isOptimsitDeleted && "hidden"} `}>
       <div className="flex-between ">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.userId}`}>
-            <img src="/assets/icons/profile-placeholder.svg" alt="Creator" />
-          </Link>
           <div className="flex flex-col">
             <p className="base-medium lg:body-bold text-light-1">
-              CREATOR NAME TO DO
+              {post.creator}
             </p>
             <div className="flex-center gap-2 text-light-3 ">
               <p className=" subtle-semibold lg:small-regular">
@@ -73,7 +70,7 @@ const PostCard = ({ post }: PostCardProps) => {
           </div>
         )}
       </div>
-      <Link to={`/posts/${post.id}`}>
+
         <div className="small-medium lg:base-medium py-5">
           <p>{post.caption}</p>
           <ul className="flex gap-1 mt-2">
@@ -94,7 +91,7 @@ const PostCard = ({ post }: PostCardProps) => {
           alt="post image"
           className="post-card_img"
         />
-      </Link>
+
       <PostStats post={post} userId={post.userId} />
     </div>
   );

@@ -24,7 +24,8 @@ export type IPost = {
   tags: string[];
   userId: string;
   createdAt: Timestamp;
-  likes: string[]
+  likes: string[];
+  creator: string;
 }
 
 export type NewPost = {
@@ -33,6 +34,7 @@ export type NewPost = {
   file: File[];
   location?: string;
   tags?: string;
+  creator: string;
 };
 
 export type UpdatePost = {

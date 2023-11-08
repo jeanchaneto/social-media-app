@@ -27,7 +27,7 @@ type PostFormProps = {
 };
 
 const PostForm = ({ post, action }: PostFormProps) => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, userData } = useContext(AuthContext);
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const naviguate = useNavigate();
@@ -68,7 +68,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     if (userId) {
       setIsCreating(true);
       try {
-        await createPost(values, userId);
+        await createPost(values, userId, userData!.username);
         form.reset();
         naviguate("/");
         return toast({

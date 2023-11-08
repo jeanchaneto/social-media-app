@@ -140,7 +140,7 @@ const convertToTagArray = (tags: string) => {
 };
 
 //Create post
-export const createPost = async (values: PostFormValues, userId: string) => {
+export const createPost = async (values: PostFormValues, userId: string, userName: string) => {
   if (values.file && values.file.length > 0) {
     //Create unique ID for storage path
     const uniqueFileName = `${uuidv4()}-${values.file[0].name}`;
@@ -158,6 +158,7 @@ export const createPost = async (values: PostFormValues, userId: string) => {
       createdAt: serverTimestamp(),
       likes: [],
       userId,
+      creator: userName
     };
     await addDoc(collection(db, "posts"), postDoc);
   }
@@ -238,6 +239,7 @@ export const getLatestPosts = async () => {
         userId: data.userId,
         createdAt: data.createdAt,
         likes: data.likes,
+        creator: data.creator
       };
     });
 
@@ -269,6 +271,7 @@ export const getPostById = async (postId: string): Promise<IPost | null> => {
         userId: data.userId,
         createdAt: data.createdAt,
         likes: data.likes,
+        creator: data.creator
       };
     } else {
       // Handle the case where the document does not exist

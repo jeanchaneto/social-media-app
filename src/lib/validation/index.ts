@@ -23,5 +23,6 @@ export const PostValidation = z.object({
     .max(200, { message: "Caption must be less than 200 characters" }),
     file: z.custom<File[]>(),
     location: z.string().min(2).max(100),
-    tags: z.string()
+    tags: z.string(),
+    creator: z.string().optional() 
 });
