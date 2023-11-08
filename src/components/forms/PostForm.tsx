@@ -19,8 +19,14 @@ import { AuthContext } from "@/context/auth-context";
 import { createPost } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../ui/use-toast";
+import { IPost } from "@/types";
 
-const PostForm = ({ post }) => {
+type PostFormProps = {
+  post?: IPost;
+  action: "create" | "update"
+}
+
+const PostForm = ({ post, action }: PostFormProps) => {
   const { currentUser } = useContext(AuthContext);
   const [isCreating, setIsCreating] = useState(false);
   const naviguate = useNavigate();
@@ -31,7 +37,7 @@ const PostForm = ({ post }) => {
       caption: post ? post?.caption : "",
       file: [],
       location: post ? post?.location : "",
-      tags: post ? post?.tags : "",
+      tags: post ? post.tags.join(',') : "",
     },
   });
 

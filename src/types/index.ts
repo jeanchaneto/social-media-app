@@ -77,3 +77,11 @@ export type PostFormValues = {
   location: string;
   tags: string;
 };
+
+export type UpdatePostFormValues = {
+  caption: string;
+  file?: File[];
+  imageUrl?: string; 
+  location: string;
+  tags: string;
+};

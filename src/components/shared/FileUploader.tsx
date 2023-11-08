@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 
 type FileUploaderProps = {
   fieldChange: (Files: File[]) => void;
-  mediaUrl: string;
+  mediaUrl: string | undefined;
 };
 
 const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {

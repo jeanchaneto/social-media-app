@@ -14,7 +14,6 @@ const Home = () => {
       try {
         const fetchedPosts = await getLatestPosts();
         setPosts(fetchedPosts);
-        console.log(fetchedPosts);
       } catch (error) {
         console.log(error);
       } finally {

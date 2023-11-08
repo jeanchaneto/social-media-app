@@ -3,6 +3,7 @@ import {
   IPost,
   NewUser,
   PostFormValues,
+  UpdatePostFormValues,
   UserLogin,
 } from "@/types";
 import { initializeApp } from "firebase/app";
@@ -155,10 +156,40 @@ export const createPost = async (values: PostFormValues, userId: string) => {
       location: values.location,
       tags: convertToTagArray(values.tags),
       createdAt: serverTimestamp(),
-      likes:[],
+      likes: [],
       userId,
     };
     await addDoc(collection(db, "posts"), postDoc);
+  }
+};
+
+//Update post
+export const updatePost = async (postId: string, updatedValues: UpdatePostFormValues) => {
+  try {
+    const postRef = doc(db, "posts", postId);
+
+    // If the post includes a new file, upload it and get the URL
+    let fileUrl = updatedValues.imageUrl; // Default to existing image URL
+    if (updatedValues.file && updatedValues.file.length > 0) {
+      const uniqueFileName = `${uuidv4()}-${updatedValues.file[0].name}`;
+      const fileRef = ref(storage, `uploads/${uniqueFileName}`);
+      const uploadResult = await uploadBytes(fileRef, updatedValues.file[0]);
+      fileUrl = await getDownloadURL(uploadResult.ref); // Update file URL
+    }
+
+    // Prepare the updated post data
+    const updatedPost = {
+      caption: updatedValues.caption,
+      imageUrl: fileUrl,
+      location: updatedValues.location,
+      tags: convertToTagArray(updatedValues.tags),
+    };
+
+    // Update the post document
+    await updateDoc(postRef, updatedPost);
+  } catch (error) {
+    console.error("Error updating post: ", error);
+    throw error;
   }
 };
 
@@ -186,7 +217,7 @@ export const getLatestPosts = async () => {
         tags: data.tags,
         userId: data.userId,
         createdAt: data.createdAt,
-        likes: data.likes
+        likes: data.likes,
       };
     });
 
@@ -197,23 +228,62 @@ export const getLatestPosts = async () => {
   }
 };
 
+//get post by ID
+export const getPostById = async (postId: string): Promise<IPost | null> => {
+  try {
+    // Create a reference to the post document
+    const postRef = doc(db, "posts", postId);
+
+    // Retrieve the document
+    const postSnap = await getDoc(postRef);
+
+    if (postSnap.exists()) {
+      // Combine the document ID with the document data
+      const data = postSnap.data();
+      return {
+        id: postSnap.id,
+        caption: data.caption,
+        imageUrl: data.imageUrl,
+        location: data.location,
+        tags: data.tags,
+        userId: data.userId,
+        createdAt: data.createdAt,
+        likes: data.likes,
+      };
+    } else {
+      // Handle the case where the document does not exist
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    // Handle any errors in fetching the document
+    console.error("Error getting document:", error);
+    throw error;
+  }
+};
+
 //Like post
-export const likePost = async (postId: string, userId: string, alreadyLiked: boolean) => {
+export const likePost = async (
+  postId: string,
+  userId: string,
+  alreadyLiked: boolean
+) => {
   const postRef = doc(db, "posts", postId);
 
   try {
-  if (alreadyLiked) {
-    // User already liked the post, so remove their like
-    await updateDoc(postRef, {
-      likes: arrayRemove(userId),
-    });
-  } else {
-    // User hasn't liked the post, so add their like
-    await updateDoc(postRef, {
-      likes: arrayUnion(userId),
-    });
-  }} catch(error) {
-    console.log("Error updating like status: ", error)
+    if (alreadyLiked) {
+      // User already liked the post, so remove their like
+      await updateDoc(postRef, {
+        likes: arrayRemove(userId),
+      });
+    } else {
+      // User hasn't liked the post, so add their like
+      await updateDoc(postRef, {
+        likes: arrayUnion(userId),
+      });
+    }
+  } catch (error) {
+    console.log("Error updating like status: ", error);
   }
 };
 
@@ -225,10 +295,14 @@ export const savePost = async (postId: string, userId: string) => {
 
 // Function to unsave a post
 export const unsavePost = async (postId: string, userId: string) => {
-  const savesQuery = query(collection(db, "saves"), where("postId", "==", postId), where("userId", "==", userId));
+  const savesQuery = query(
+    collection(db, "saves"),
+    where("postId", "==", postId),
+    where("userId", "==", userId)
+  );
   const querySnapshot = await getDocs(savesQuery);
   querySnapshot.forEach((doc) => {
     deleteDoc(doc.ref);
   });
-  return querySnapshot.docs.map(doc => doc.ref); // Return the document references of unsaved posts
+  return querySnapshot.docs.map((doc) => doc.ref); // Return the document references of unsaved posts
 };
