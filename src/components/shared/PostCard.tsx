@@ -1,8 +1,10 @@
 import { AuthContext } from "@/context/auth-context";
 import { IPost } from "@/types";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
+import { deletePost } from "@/lib/firebase";
+import { toast } from "../ui/use-toast";
 
 type PostCardProps = {
   post: IPost;
@@ -10,11 +12,28 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
   const { currentUser } = useContext(AuthContext);
+  const [isOptimsitDeleted, setIsoptimisticDeleted] = useState(false);
   // Check if tags is an array
   const tagsElement = Array.isArray(post.tags);
 
+  const handleDelete = async () => {
+    try {
+      setIsoptimisticDeleted(true);
+      deletePost(post.id, post.imageUrl);
+      return toast({
+        title: "Post deleted",
+      });
+    } catch (error) {
+      console.log(error);
+      setIsoptimisticDeleted(false);
+      return toast({
+        title: "Error deleting post",
+      });
+    }
+  };
+
   return (
-    <div className="post-card">
+    <div className={`post-card ${isOptimsitDeleted && "hidden"} `}>
       <div className="flex-between ">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.userId}`}>
@@ -36,14 +55,22 @@ const PostCard = ({ post }: PostCardProps) => {
           </div>
         </div>
         {currentUser?.uid === post.userId && (
-          <Link to={`/update-post/${post.id}`}>
+          <div className="flex gap-3">
             <img
-              src="/assets/icons/edit.svg"
-              alt="Edit post"
-              width={20}
-              height={20}
+              src="/delete.svg"
+              alt="Delete"
+              className="cursor-pointer"
+              onClick={handleDelete}
             />
-          </Link>
+            <Link to={`/update-post/${post.id}`}>
+              <img
+                src="/assets/icons/edit.svg"
+                alt="Edit post"
+                width={20}
+                height={20}
+              />
+            </Link>
+          </div>
         )}
       </div>
       <Link to={`/posts/${post.id}`}>

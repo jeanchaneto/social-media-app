@@ -16,38 +16,59 @@ import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
-import { createPost } from "@/lib/firebase";
+import { createPost, updatePost } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../ui/use-toast";
 import { IPost } from "@/types";
 
 type PostFormProps = {
   post?: IPost;
-  action: "create" | "update"
-}
+  action: "create" | "update";
+};
 
 const PostForm = ({ post, action }: PostFormProps) => {
   const { currentUser } = useContext(AuthContext);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const naviguate = useNavigate();
   const { toast } = useToast();
+
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
       caption: post ? post?.caption : "",
       file: [],
       location: post ? post?.location : "",
-      tags: post ? post.tags.join(',') : "",
+      tags: post ? post.tags.join(",") : "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof PostValidation>) {
     const userId = currentUser?.uid;
+
+    if (post && action === "update") {
+      if (userId) {
+        setIsUpdating(true);
+        try {
+          await updatePost(post.id, values);
+          return toast({
+            title: "Post updated successfully",
+          });
+        } catch (error) {
+          console.log("Error updating post:", error);
+          return toast({
+            title: "Error creating post",
+          });
+        } finally {
+          setIsUpdating(false);
+        }
+      }
+    }
+
     if (userId) {
       setIsCreating(true);
       try {
         await createPost(values, userId);
-        setIsCreating(false);
         form.reset();
         naviguate("/");
         return toast({
@@ -58,6 +79,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
         return toast({
           title: "Error creating post",
         });
+      } finally {
+        setIsCreating(false);
       }
     }
   }
@@ -135,8 +158,12 @@ const PostForm = ({ post, action }: PostFormProps) => {
           <Button type="button" className="shad-button_dark_4">
             Cancel
           </Button>
-          <Button disabled={isCreating} type="submit" className="shad-button_primary">
-            { isCreating ? "Creating Post..." :"Submit"}
+          <Button
+            disabled={isCreating}
+            type="submit"
+            className="shad-button_primary"
+          >
+            {isCreating ? "Creating Post..." : isUpdating ? "Updating Post..." : "Submit"}
           </Button>
         </div>
       </form>

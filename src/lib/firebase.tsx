@@ -32,7 +32,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 //Config
@@ -189,6 +189,26 @@ export const updatePost = async (postId: string, updatedValues: UpdatePostFormVa
     await updateDoc(postRef, updatedPost);
   } catch (error) {
     console.error("Error updating post: ", error);
+    throw error;
+  }
+};
+
+//Delete post
+export const deletePost = async (postId: string, imageUrl: string) => {
+  try {
+    // Create a reference to the post document
+    const postRef = doc(db, "posts", postId);
+
+    // Delete the post document from Firestore
+    await deleteDoc(postRef);
+
+    // If the post has an associated image, delete it from Firebase Storage
+    if (imageUrl) {
+      const imageRef = ref(storage, imageUrl);
+      await deleteObject(imageRef);
+    }
+  } catch (error) {
+    console.error("Error deleting post: ", error);
     throw error;
   }
 };
