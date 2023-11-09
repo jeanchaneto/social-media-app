@@ -143,9 +143,9 @@ const convertToTagArray = (tags: string) => {
 export const createPost = async (values: PostFormValues, userId: string, userName: string) => {
   if (values.file && values.file.length > 0) {
     //Create unique ID for storage path
-    const uniqueFileName = `${uuidv4()}-${values.file[0].name}`;
+    const imageStoragePath = `${uuidv4()}-${values.file[0].name}`;
     // Upload file to Firebase Storage
-    const fileRef = ref(storage, `uploads/${uniqueFileName}`);
+    const fileRef = ref(storage, `uploads/${imageStoragePath}`);
     const uploadResult = await uploadBytes(fileRef, values.file[0]);
     const fileUrl = await getDownloadURL(uploadResult.ref);
 
@@ -158,6 +158,7 @@ export const createPost = async (values: PostFormValues, userId: string, userNam
       createdAt: serverTimestamp(),
       likes: [],
       userId,
+      imageStoragePath,
       creator: userName
     };
     await addDoc(collection(db, "posts"), postDoc);
@@ -195,7 +196,7 @@ export const updatePost = async (postId: string, updatedValues: UpdatePostFormVa
 };
 
 //Delete post
-export const deletePost = async (postId: string, imageUrl: string) => {
+export const deletePost = async (postId: string, imageStoragePath: string) => {
   try {
     // Create a reference to the post document
     const postRef = doc(db, "posts", postId);
@@ -204,8 +205,8 @@ export const deletePost = async (postId: string, imageUrl: string) => {
     await deleteDoc(postRef);
 
     // If the post has an associated image, delete it from Firebase Storage
-    if (imageUrl) {
-      const imageRef = ref(storage, imageUrl);
+    if (imageStoragePath) {
+      const imageRef = ref(storage, `uploads/${imageStoragePath}`);
       await deleteObject(imageRef);
     }
   } catch (error) {
@@ -239,7 +240,8 @@ export const getLatestPosts = async () => {
         userId: data.userId,
         createdAt: data.createdAt,
         likes: data.likes,
-        creator: data.creator
+        creator: data.creator,
+        imageStoragePath: data.imageStoragePath
       };
     });
 
@@ -271,7 +273,8 @@ export const getPostById = async (postId: string): Promise<IPost | null> => {
         userId: data.userId,
         createdAt: data.createdAt,
         likes: data.likes,
-        creator: data.creator
+        creator: data.creator,
+        imageStoragePath: data.imageStoragePath
       };
     } else {
       // Handle the case where the document does not exist

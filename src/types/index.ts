@@ -26,6 +26,7 @@ export type IPost = {
   createdAt: Timestamp;
   likes: string[];
   creator: string;
+  imageStoragePath: string;
 }
 
 export type NewPost = {

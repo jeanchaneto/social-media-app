@@ -19,7 +19,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const handleDelete = async () => {
     try {
       setIsoptimisticDeleted(true);
-      deletePost(post.id, post.imageUrl);
+      deletePost(post.id, post.imageStoragePath);
       return toast({
         title: "Post deleted",
       });
