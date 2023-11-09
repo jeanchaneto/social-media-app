@@ -222,7 +222,7 @@ export const getLatestPosts = async () => {
     const postsQuery = query(
       collection(db, "posts"),
       orderBy("createdAt", "desc"), // Order by createdAt timestamp in descending order
-      limit(10) // INFINITE SCROLL TO IMPLEMENT WHEN TIME ALLOWS!
+      limit(20) // INFINITE SCROLL TO IMPLEMENT WHEN TIME ALLOWS!
     );
 
     // Execute the query

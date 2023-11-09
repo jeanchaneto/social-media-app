@@ -4,7 +4,9 @@
 
 A demo social media app with full CRUD capabilities and email/password authentication usgin Firebase.
 
-React, , Firebase, TailwindCSS, React Router.
+Users can post a photo, like and save posts.
 
-[Go to website](https://lap-studios.com/)
+React, Firebase, TailwindCSS, React Router, ShadcnUI.
+
+[Go to website](https://social-media-app-lyart-nu.vercel.app/)
 
