@@ -4,7 +4,7 @@ import { AuthContext } from "@/context/auth-context";
 
 const AuthLayout = () => {
   const { currentUser } = useContext(AuthContext);
-  console.log(currentUser);
+
   return (
     <>
       {currentUser ? (

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
 import { deletePost } from "@/lib/firebase";
 import { toast } from "../ui/use-toast";
+import Loader from "./Loader";
 
 type PostCardProps = {
   post: IPost;
@@ -13,8 +14,14 @@ type PostCardProps = {
 const PostCard = ({ post }: PostCardProps) => {
   const { currentUser } = useContext(AuthContext);
   const [isOptimsitDeleted, setIsoptimisticDeleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   // Check if tags is an array
   const tagsElement = Array.isArray(post.tags);
+
+  const handleImageLoaded = () => {
+    setIsLoading(false);
+  };
 
   const handleDelete = async () => {
     try {
@@ -71,27 +78,30 @@ const PostCard = ({ post }: PostCardProps) => {
         )}
       </div>
 
-        <div className="small-medium lg:base-medium py-5">
-          <p>{post.caption}</p>
-          <ul className="flex gap-1 mt-2">
-            {tagsElement &&
-              post?.tags.map((tag: string, index: number) => (
-                <li
-                  key={`${tag}${index}`}
-                  className="text-light-3 small-regular"
-                >
-                  #{tag}
-                </li>
-              ))}
-          </ul>
-        </div>
-
+      <div className="small-medium lg:base-medium py-5">
+        <p>{post.caption}</p>
+        <ul className="flex gap-1 mt-2">
+          {tagsElement &&
+            post?.tags.map((tag: string, index: number) => (
+              <li key={`${tag}${index}`} className="text-light-3 small-regular">
+                #{tag}
+              </li>
+            ))}
+        </ul>
+      </div>
+      <div className="h-96 relative">
+        {isLoading && (
+          <div className="absolute left-1/2 top-1/2">
+            <Loader />
+          </div>
+        )}
         <img
           src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
           alt="post image"
           className="post-card_img"
+          onLoad={handleImageLoaded}
         />
-
+      </div>
       <PostStats post={post} />
     </div>
   );
