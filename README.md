@@ -2,7 +2,7 @@
 
 ![](./public/readme-preview.jpg )
 
-A demo social media app with full CRUD capabilities and email/password authentication usgin Firebase.
+A demo social media app with full CRUD capabilities and email/password authentication using Firebase.
 
 Users can post a photo, like and save posts.
 
