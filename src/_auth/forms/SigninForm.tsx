@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { loginEmailPassword } from "@/lib/firebase";
+import DemoNote from "@/components/shared/DemoNote";
 
 const SignInForm = () => {
   const { toast } = useToast();
@@ -72,6 +73,7 @@ const SignInForm = () => {
         <p className="text-light-3 small-medium md:base-regular mt-2">
           Enter your credentials
         </p>
+        <DemoNote/>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5 w-full"

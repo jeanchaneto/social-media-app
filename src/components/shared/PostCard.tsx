@@ -92,7 +92,7 @@ const PostCard = ({ post }: PostCardProps) => {
           className="post-card_img"
         />
 
-      <PostStats post={post} userId={post.userId} />
+      <PostStats post={post} />
     </div>
   );
 };

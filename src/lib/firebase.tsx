@@ -159,7 +159,7 @@ export const createPost = async (values: PostFormValues, userId: string, userNam
       likes: [],
       userId,
       imageStoragePath,
-      creator: userName
+      creator: userName,
     };
     await addDoc(collection(db, "posts"), postDoc);
   }
@@ -222,7 +222,7 @@ export const getLatestPosts = async () => {
     const postsQuery = query(
       collection(db, "posts"),
       orderBy("createdAt", "desc"), // Order by createdAt timestamp in descending order
-      limit(20) // Limit to 20 posts
+      limit(8) // Limit to 8 posts
     );
 
     // Execute the query

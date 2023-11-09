@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 const Home = () => {
   const [isLoading, setIsloading] = useState(true);
   const [posts, setPosts] = useState<IPost[] | null>(null);
-
   useEffect(() => {
     const fetchPosts = async () => {
       setIsloading(true);

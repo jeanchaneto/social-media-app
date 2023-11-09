@@ -38,8 +38,8 @@ const Saved = () => {
             <Loader />
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">
-              {savedPosts?.map((post: IPost) => (
-                <li key={post.id} className="flex justify-center w-full">
+              {savedPosts?.map((post: IPost, i) => (
+                <li key={i} className="flex justify-center w-full">
                   <PostCard post={post} />
                 </li>
               ))}
