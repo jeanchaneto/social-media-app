@@ -89,7 +89,7 @@ const PostCard = ({ post }: PostCardProps) => {
             ))}
         </ul>
       </div>
-      <div className="h-96 relative">
+      <div className="h-64 xs:h-[400px] lg:h-[450px] relative mb-6">
         {isLoading && (
           <div className="absolute left-1/2 top-1/2">
             <Loader />
